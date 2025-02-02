@@ -1,0 +1,21 @@
+{
+  "name": "postmanify-express",
+  "version": "1.0.0",
+  "description": "Create a postman collection base on the express functions without write annotation or using documentation. ",
+  "homepage": "https://github.com/salsabeelomar/postmanify-express#readme",
+  "bugs": {
+    "url": "https://github.com/salsabeelomar/postmanify-express/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salsabeelomar/postmanify-express.git"
+  },
+  "license": "MIT",
+  "author": "Salsabeel Alnajjar",
+  "type": "module",
+  "keywords": ["postman","express","API" ,"npm", "package"],
+  "main": "main.js",
+  "scripts": {
+    "test": "npm run dev"
+  }
+}

@@ -3,7 +3,8 @@ const main = require("./main");
 
 const server = http.createServer(main);
 
+const PORT = process.env.PORT || 5000;
 
-server.listen(5000, () => {
-  console.log(`server is running on http://localhost:${process.env.PORT}`);
+server.listen(PORT, () => {
+  console.log(`server is running on http://localhost:${PORT}`);
 });

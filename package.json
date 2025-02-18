@@ -10,7 +10,13 @@
     "url": "git+https://github.com/salsabeelomar/postmanify-express.git"
   },
   "license": "MIT",
-  "author": "Salsabeel Alnajjar",
+  "author": [
+    "Salsabeel Alnajjar",
+    "Basma skaik",
+    "Jomana Alzayagh",
+    "Shams Alwadiya",
+    "Sarah Alhissy"
+  ],
   "keywords": [
     "postman",
     "express",
@@ -20,7 +26,7 @@
   ],
   "main": "server.js",
   "scripts": {
-    "test": "npm run dev",
+    "test": "mocha test/scanner.test.js",
     "start": "nodemon server.js"
   },
   "dependencies": {
@@ -31,9 +37,12 @@
     "nodemon": "^1.1.2"
   },
   "devDependencies": {
+    "chai": "^5.2.0",
+    "chai-http": "^5.1.1",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
+    "mocha": "^11.1.0",
     "prettier": "^3.4.2"
   }
 }

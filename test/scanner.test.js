@@ -1,160 +1,50 @@
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const app = require("../examples/demo-app");
+const path = require("path");
+const { detectRoutes } = require("../src/scanner/route-detector"); // Import the function
+const fs = require("fs");
 
-chai.use(chaiHttp);
-const expect = chai.expect;
+describe("detectRoutes function", () => {
+  const testFilePath = path.join(__dirname, "../examples/demo-app.js");
 
-describe("Express App Tests", () => {
-  // Test GET /home
-  describe("GET /home", () => {
-    it("should return status 200 and 'Hello World'", (done) => {
-      chai
-        .request(app)
-        .get("/home")
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.text).to.equal("Hello World");
-          done();
-        });
-    });
+  beforeAll(() => {
+    if (!fs.existsSync(testFilePath)) {
+      throw new Error(`Test file not found: ${testFilePath}`);
+    }
   });
 
-  // Test POST /users
-  describe("POST /users", () => {
-    it("should return status 201, authorization header, and user data", (done) => {
-      const userData = { name: "John Doe", email: "john@example.com" };
-      chai
-        .request(app)
-        .post("/users")
-        .send(userData)
-        .end((err, res) => {
-          expect(res).to.have.status(201);
-          expect(res).to.have.header("authorization", "Bearer token12122");
-          expect(res.body).to.deep.equal({
-            message: "User created successfully",
-            data: userData,
-          });
-          done();
-        });
-    });
+  it("should detect all routes correctly", () => {
+    const routes = detectRoutes(testFilePath);
+    expect(routes).toEqual(
+      expect.arrayContaining([
+        { method: "GET", path: "/home" },
+        { method: "POST", path: "/users" },
+        { method: "DELETE", path: "/users/:id" },
+        { method: "PATCH", path: "/users/:id" },
+        { method: "PUT", path: "/users/:id" },
+      ])
+    );
   });
 
-  // Test DELETE /users/:id
-  describe("DELETE /users/:id", () => {
-    it("should return status 200 and success message if user is deleted", (done) => {
-      const userId = 1;
-      chai
-        .request(app)
-        .delete(`/users/${userId}`)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.deep.equal({
-            status: 200,
-            message: "User deleted successfully",
-            data: {
-              id: userId.toString(),
-            },
-          });
-          done();
-        });
-    });
+  it("should return an empty array if no routes exist", () => {
+    const emptyFilePath = path.join(__dirname, "../examples/empty-app.js");
+    fs.writeFileSync(emptyFilePath, "");
 
-    it("should return status 404 and error message if user is not found", (done) => {
-      const userId = 0; // Simulate a user not found scenario
-      chai
-        .request(app)
-        .delete(`/users/${userId}`)
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(res.body).to.deep.equal({
-            status: 404,
-            message: "User not found or could not be deleted",
-          });
-          done();
-        });
-    });
+    const routes = detectRoutes(emptyFilePath);
+    expect(routes).toEqual([]);
+
+    fs.unlinkSync(emptyFilePath);
   });
 
-  // Test PATCH /users/:id
-  describe("PATCH /users/:id", () => {
-    it("should return status 200 and updated user data if user is updated", (done) => {
-      const userId = 1;
-      const updatedData = { name: "Jane Doe" };
-      chai
-        .request(app)
-        .patch(`/users/${userId}`)
-        .send(updatedData)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.deep.equal({
-            status: 200,
-            message: "User updated successfully",
-            data: {
-              id: userId.toString(),
-              ...updatedData,
-            },
-          });
-          done();
-        });
-    });
-
-    it("should return status 404 and error message if user is not found", (done) => {
-      const userId = 0; // Simulate a user not found scenario
-      const updatedData = { name: "Jane Doe" };
-      chai
-        .request(app)
-        .patch(`/users/${userId}`)
-        .send(updatedData)
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(res.body).to.deep.equal({
-            status: 404,
-            message: "User not found or could not be updated",
-          });
-          done();
-        });
-    });
+  it("should throw an error if the file does not exist", () => {
+    const nonExistentPath = path.join(__dirname, "../non-existent.js");
+    expect(() => detectRoutes(nonExistentPath)).toThrow("File not found:");
   });
 
-  // Test PUT /users/:id
-  describe("PUT /users/:id", () => {
-    it("should return status 200 and updated user data if user is updated", (done) => {
-      const userId = 1;
-      const updatedData = { name: "Jane Doe", email: "jane@example.com" };
-      chai
-        .request(app)
-        .put(`/users/${userId}`)
-        .send(updatedData)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.deep.equal({
-            status: 200,
-            message: "User updated successfully",
-            data: {
-              id: userId.toString(),
-              ...updatedData,
-            },
-          });
-          done();
-        });
-    });
+  it("should throw an error if the file has invalid syntax", () => {
+    const invalidFilePath = path.join(__dirname, "../examples/invalid-app.js");
+    fs.writeFileSync(invalidFilePath, "invalid code $$ %%");
 
-    it("should return status 404 and error message if user is not found", (done) => {
-      const userId = 0; // Simulate a user not found scenario
-      const updatedData = { name: "Jane Doe", email: "jane@example.com" };
-      chai
-        .request(app)
-        .put(`/users/${userId}`)
-        .send(updatedData)
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(res.body).to.deep.equal({
-            status: 404,
-            message: "User not found or could not be updated",
-          });
-          done();
-        });
-    });
+    expect(() => detectRoutes(invalidFilePath)).toThrow("Parsing error:");
+
+    fs.unlinkSync(invalidFilePath); 
   });
 });

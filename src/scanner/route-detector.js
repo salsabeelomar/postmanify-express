@@ -1,29 +1,38 @@
 const fs = require("fs");
-const path = require("path");
 const { parse } = require("@babel/parser");
 const traverse = require("@babel/traverse").default;
 
-// Scans Express code and detects route definitions
 function detectRoutes(entryFile) {
-  const routes = [];
+  if (!fs.existsSync(entryFile)) {
+    throw new Error(`File not found: ${entryFile}`);
+  }
+
   const code = fs.readFileSync(entryFile, "utf-8");
 
-  const ast = parse(code, {
-    sourceType: "module",
-    plugins: ["jsx"],
-  });
+  try {
+    ast = parse(code, {
+      sourceType: "module",
+      plugins: ["typescript"],
+    });
+  } catch (error) {
+    throw new Error(`Parsing error: ${error.message}`);
+  }
+
+  const routes = [];
 
   traverse(ast, {
     CallExpression({ node }) {
       if (
-        node.callee.object?.name === "app" ||
-        node.callee.object?.property?.name === "router"
+        node.callee.object?.name === "app" &&
+        ["get", "post", "put", "patch", "delete"].includes(
+          node.callee.property?.name
+        )
       ) {
-        const method = node.callee.property.name; // e.g., "get", "post"
-        const path = node.arguments[0]?.value; // e.g., "/api/users"
+        const method = node.callee.property.name.toUpperCase();
+        const path = node.arguments[0]?.value;
 
         if (method && path) {
-          routes.push({ method: method.toUpperCase(), path });
+          routes.push({ method, path });
         }
       }
     },

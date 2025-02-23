@@ -1,5 +1,5 @@
 const path = require("path");
-const { detectRoutes } = require("../src/scanner/route-detector"); // Import the function
+const { detectRoutes } = require("../src/scanner/route-detector");
 const fs = require("fs");
 
 describe("detectRoutes function", () => {
@@ -12,14 +12,39 @@ describe("detectRoutes function", () => {
   });
 
   it("should detect all routes correctly", () => {
-    const routes = detectRoutes(testFilePath);
+    const { routes } = detectRoutes(testFilePath); // Destructure routes
     expect(routes).toEqual(
       expect.arrayContaining([
-        { method: "GET", path: "/home" },
-        { method: "POST", path: "/users" },
-        { method: "DELETE", path: "/users/:id" },
-        { method: "PATCH", path: "/users/:id" },
-        { method: "PUT", path: "/users/:id" },
+        {
+          method: "GET",
+          path: "/home",
+          middlewares: [],
+          handler: expect.any(String),
+        },
+        {
+          method: "POST",
+          path: "/users",
+          middlewares: [],
+          handler: expect.any(String),
+        },
+        {
+          method: "DELETE",
+          path: "/users/:id",
+          middlewares: [],
+          handler: expect.any(String),
+        },
+        {
+          method: "PATCH",
+          path: "/users/:id",
+          middlewares: [],
+          handler: expect.any(String),
+        },
+        {
+          method: "PUT",
+          path: "/users/:id",
+          middlewares: [],
+          handler: expect.any(String),
+        },
       ])
     );
   });
@@ -28,7 +53,7 @@ describe("detectRoutes function", () => {
     const emptyFilePath = path.join(__dirname, "../examples/empty-app.js");
     fs.writeFileSync(emptyFilePath, "");
 
-    const routes = detectRoutes(emptyFilePath);
+    const { routes } = detectRoutes(emptyFilePath); // Destructure routes
     expect(routes).toEqual([]);
 
     fs.unlinkSync(emptyFilePath);
@@ -45,6 +70,6 @@ describe("detectRoutes function", () => {
 
     expect(() => detectRoutes(invalidFilePath)).toThrow("Parsing error:");
 
-    fs.unlinkSync(invalidFilePath); 
+    fs.unlinkSync(invalidFilePath);
   });
 });

@@ -29,7 +29,7 @@ Generate a Postman collection from your Express.js routes file using:
 
 ```bash
 npx postmanify-express generate --input <your-express-routes-file.js>
-npx postmanify-express generate --input examples/demo-app.js --output postman.json
+npx postmanify-express generate --input  <your-express-routes-file.js> --output <your-api-collection.json>
 npx postmanify-express generate --input <your-express-routes-file.js> --exclude [<route>]
 
 ```

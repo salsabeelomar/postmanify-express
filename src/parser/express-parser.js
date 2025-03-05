@@ -11,7 +11,6 @@ function parseRoutes(routes, appMiddlewares = []) {
   });
 }
 
-// Helper functions
 function detectHeaders(routeMiddlewares, appMiddlewares) {
   const allMiddlewares = [...appMiddlewares, ...routeMiddlewares];
   const headers = [];
@@ -44,5 +43,4 @@ function detectRequestBody(middlewares) {
   return hasBodyParser ? { mode: "raw", raw: "{{request_body}}" } : null;
 }
 
-// Export the function
 module.exports = { parseRoutes };

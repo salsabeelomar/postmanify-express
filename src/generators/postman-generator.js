@@ -14,7 +14,7 @@ function generatePostmanCollection(routes) {
             host: ["{{base_url}}"],
             path: route.request.path
               ? route.request.path.split("/").filter(Boolean)
-              : [], // Add a fallback
+              : [], 
           },
           header: route.request.header,
         },

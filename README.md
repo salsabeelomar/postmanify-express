@@ -28,19 +28,19 @@ npm i postmanify-express
 Generate a Postman collection from your Express.js routes file using:
 
 ```bash
-npx postmanify-express --input <your-express-routes-file.js>
-npx postmanify-express --input <your-express-routes-file.js> --exclude [<route>]
+npx postmanify-express generate --input <your-express-routes-file.js>
+npx postmanify-express generate --input examples/demo-app.js --output postman.json
+npx postmanify-express generate --input <your-express-routes-file.js> --exclude [<route>]
 
 ```
 
-Command Overview
+### Command Overview
 
-#### Option         Description
----
---input <file>      (Required) Path to your Express.js routes file
----
---exclude [<route>] (Optional) Route paths to exclude from collection (can be specified multiple times)
-
+| Command           | Description                          | Example                     |
+|-------------------|--------------------------------------|-----------------------------|
+| `--input <file>`  | Path to the file containing your Express.js route definitions.The file must export an Express router or app instance.| `npx postmanify-express generate --input examples/demo-app.js`
+| `--output <file>`    |Path where the generated Postman collection will be saved. If not provided, the collection will be saved as postman-collection.json in the current directory.  | ` npx postmanify-express generate --input examples/demo-app.js --output postman.json`
+| `--exclude [<route>] `     | Route paths to exclude from the generated Postman collection. This option can be used multiple times to exclude multiple routes.      | `npx postmanify-express generate --input examples/demo-app.js --exclude [/home]`                  |
 ## Features
 
 - Automatically Postman Collection Generation

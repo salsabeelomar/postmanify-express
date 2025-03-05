@@ -13,7 +13,7 @@ const prettyError = require("pretty-error").start();
 program
   .command("generate")
   .description("Generate Postman collection from Express routes")
-  .option("-e, --exclude <routes>", "Comma-separated routes to exclude")
+  .option("-e, --exclude [<routes>]", "Comma-separated routes to exclude")
   .option("-i, --input <file>", "Entry file (e.g., app.js)", "app.js")
   .option("-o, --output <file>", "Output JSON file", "postman-collection.json")
   .option("--no-auth", "Skip authentication headers detection")

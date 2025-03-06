@@ -20,6 +20,7 @@ function detectRoutes(entryFile) {
 
   const routes = [];
   const appMiddlewares = [];
+  const routerMiddlewares = [];
 
   traverse(ast, {
     CallExpression({ node }) {
@@ -31,6 +32,20 @@ function detectRoutes(entryFile) {
         const middleware = node.arguments[0];
         if (middleware) {
           appMiddlewares.push({
+            name: middleware.name || "anonymousMiddleware",
+            code: code.slice(middleware.start, middleware.end),
+          });
+        }
+      }
+
+      // Detect router-level middlewares (router.use())
+      if (
+        node.callee.object?.name === "router" &&
+        node.callee.property?.name === "use"
+      ) {
+        const middleware = node.arguments[0];
+        if (middleware) {
+          routerMiddlewares.push({
             name: middleware.name || "anonymousMiddleware",
             code: code.slice(middleware.start, middleware.end),
           });
@@ -60,6 +75,35 @@ function detectRoutes(entryFile) {
             middlewares,
             handler: code.slice(
               // Store handler code for body detection
+              node.arguments[node.arguments.length - 1].start,
+              node.arguments[node.arguments.length - 1].end
+            ),
+          });
+        }
+      }
+
+      // Detect routes defined on router (router.get(), router.post(), etc.)
+      if (
+        node.callee.object?.name === "router" &&
+        ["get", "post", "put", "patch", "delete"].includes(
+          node.callee.property?.name
+        )
+      ) {
+        const method = node.callee.property.name.toUpperCase();
+        const path = node.arguments[0]?.value;
+        const middlewares = node.arguments
+          .slice(1, -1) // Exclude path and final handler
+          .map((arg) => ({
+            name: arg.name || "anonymousMiddleware",
+            code: code.slice(arg.start, arg.end),
+          }));
+
+        if (method && path) {
+          routes.push({
+            method,
+            path,
+            middlewares,
+            handler: code.slice(
               node.arguments[node.arguments.length - 1].start,
               node.arguments[node.arguments.length - 1].end
             ),

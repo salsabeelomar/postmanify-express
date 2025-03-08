@@ -5,7 +5,7 @@ function parseRoutes(routes, appMiddlewares = []) {
       url: `{{base_url}}${route.path}`,
       header: detectHeaders(route.middlewares, appMiddlewares),
       query: detectQueryParams(route.path),
-      body: detectRequestBody(route.middlewares),
+      body: detectRequestBody(route.middlewares, route.handler),
     };
     return { name: `${route.method} ${route.path}`, request };
   });
@@ -34,13 +34,17 @@ function detectQueryParams(path) {
   return queryParams;
 }
 
-function detectRequestBody(middlewares) {
+function detectRequestBody(middlewares, handlerCode) {
   const hasBodyParser = middlewares.some(
     (middleware) =>
       middleware.code.includes("express.json()") ||
       middleware.code.includes("express.urlencoded()")
   );
-  return hasBodyParser ? { mode: "raw", raw: "{{request_body}}" } : null;
+  const usesRequestBody = handlerCode.includes("req.body");
+
+  return hasBodyParser && usesRequestBody
+    ? { mode: "raw", raw: "{{request_body}}" }
+    : null;
 }
 
 module.exports = { parseRoutes };

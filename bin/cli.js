@@ -8,6 +8,7 @@ const {
 const { loadConfig } = require("../src/utils/config-loader");
 
 const fs = require("fs");
+
 const prettyError = require("pretty-error").start();
 
 program
@@ -38,10 +39,9 @@ program
           )
       );
 
-
       const parsedRoutes = parseRoutes(filteredRoutes, appMiddlewares, config);
       const collection = generatePostmanCollection(parsedRoutes, config);
-
+      // console.log(JSON.stringify(collection, null, 2));
       fs.writeFileSync(options.output, JSON.stringify(collection, null, 2));
       console.log(`✅ Collection generated at ${options.output}`);
       console.log(

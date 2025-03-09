@@ -1,26 +1,20 @@
-function parseRoutes(routes, appMiddlewares = []) {
+function parseRoutes(routes, appMiddlewares = [], config) {
+  console.log(config);
+
   return routes.map((route) => {
     const request = {
       method: route.method,
       url: `{{base_url}}${route.path}`,
-      header: detectHeaders(route.middlewares, appMiddlewares),
+      headers:
+        config.detectAuth === false
+          ? []
+          : detectHeaders(route.handler, appMiddlewares),
       query: detectQueryParams(route.path),
       body: detectRequestBody(route.middlewares, route.handler),
     };
+
     return { name: `${route.method} ${route.path}`, request };
   });
-}
-
-function detectHeaders(routeMiddlewares, appMiddlewares) {
-  const allMiddlewares = [...appMiddlewares, ...routeMiddlewares];
-  const headers = [];
-
-  allMiddlewares.forEach((middleware) => {
-    if (middleware.code.includes("req.headers.authorization")) {
-      headers.push({ key: "Authorization", value: "Bearer {{token}}" });
-    }
-  });
-  return headers;
 }
 
 function detectQueryParams(path) {
@@ -32,6 +26,40 @@ function detectQueryParams(path) {
     queryParams.push({ key: match[1], value: match[2] });
   }
   return queryParams;
+}
+
+function detectHeaders(routeMiddlewares, appMiddlewares) {
+  const allMiddlewares = Array.isArray(routeMiddlewares)
+    ? routeMiddlewares
+    : [routeMiddlewares];
+  const headers = [];
+
+  allMiddlewares.forEach((middleware) => {
+    if (typeof middleware === "string") {
+      middleware = new Function("req", "res", middleware);
+    }
+
+    if (typeof middleware === "function") {
+      const middlewareCode = middleware.toString();
+      if (
+        middlewareCode.includes("res.set") ||
+        middlewareCode.includes("res.header")
+      ) {
+        if (middlewareCode.includes("Authorization")) {
+          headers.push({ key: "Authorization", value: "Bearer {{token}}" });
+        }
+
+        if (middlewareCode.includes("Access-Control-Expose-Headers")) {
+          headers.push({
+            key: "Access-Control-Expose-Headers",
+            value: "Authorization",
+          });
+        }
+      }
+    }
+  });
+
+  return headers;
 }
 
 function detectRequestBody(middlewares, handlerCode) {
@@ -47,4 +75,4 @@ function detectRequestBody(middlewares, handlerCode) {
     : null;
 }
 
-module.exports = { parseRoutes };
+module.exports = { parseRoutes, detectHeaders };

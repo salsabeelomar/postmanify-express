@@ -12,7 +12,6 @@ router.post("/users", (req, res) => {
   const userData = req.body;
   res.set({
     Authorization: "Bearer token12122",
-    "Access-Control-Expose-Headers": "Authorization",
   });
   res.status(201).json({
     message: "User created successfully",
@@ -22,7 +21,7 @@ router.post("/users", (req, res) => {
 
 router.delete("/users/:id", (req, res) => {
   const userId = req.params.id;
-  const userDeleted = 1; // Temporary fix (replace with actual deletion logic)
+  const userDeleted = 1;
 
   if (userDeleted > 0) {
     res.status(200).json({

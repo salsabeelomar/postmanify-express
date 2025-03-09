@@ -6,7 +6,7 @@ function generatePostmanCollection(routes) {
         "https://schema.postman.com/json/collection/v2.1.0/collection.json",
     },
     item: routes.map((route) => {
-      const urlWithoutBase = route.request.url.replace("{{base_url}}", ""); // Remove base URL
+      const urlWithoutBase = route.request.url.replace("{{base_url}}", "");
       return {
         name: route.name,
         request: {
@@ -14,14 +14,9 @@ function generatePostmanCollection(routes) {
           url: {
             raw: route.request.url,
             host: ["{{base_url}}"],
-            path: urlWithoutBase.split("/").filter(Boolean), // Only split the path
+            path: urlWithoutBase.split("/").filter(Boolean),
           },
-          header: route.request.headers
-            ? Object.entries(route.request.headers).map(([key, value]) => ({
-                key,
-                value,
-              }))
-            : [],
+          headers: route.request.headers,
           body:
             ["POST", "PUT", "PATCH"].includes(route.request.method) &&
             route.request.body

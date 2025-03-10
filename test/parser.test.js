@@ -7,11 +7,20 @@ describe("Route Parsing", () => {
       {
         method: "GET",
         path: "/secret",
-        middlewares: [{ code: "req.headers.authorization" }],
+        middlewares: [
+          "(req, res) => { res.set('Authorization', 'Bearer token'); }",
+        ],
+        handler:
+          "(req, res) => { res.set('Authorization', 'Bearer {{token}}'); res.send('Secret'); }",
       },
     ];
-    const parsed = parseRoutes(routes, [{ code: "checkAdmin" }]);
-    expect(parsed[0].request.header).toEqual(
+
+    // ✅ Pass config object with detectAuth property
+    const parsed = parseRoutes(routes, [{ code: "checkAdmin" }], {
+      detectAuth: true,
+    });
+
+    expect(parsed[0].request.headers).toEqual(
       expect.arrayContaining([
         { key: "Authorization", value: "Bearer {{token}}" },
       ])

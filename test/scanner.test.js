@@ -3,7 +3,8 @@ const { detectRoutes } = require("../src/scanner/route-detector");
 const fs = require("fs");
 
 describe("detectRoutes function", () => {
-  const testFilePath = path.join(__dirname, "../examples/demo-app.js");
+  // const testFilePath = path.join(__dirname, "../examples/demo-app.js");
+  const testFilePath = path.join(__dirname, "../examples/demo-routes.js");
 
   beforeAll(() => {
     if (!fs.existsSync(testFilePath)) {

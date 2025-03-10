@@ -1,6 +1,4 @@
 function parseRoutes(routes, appMiddlewares = [], config) {
-  console.log(config);
-
   return routes.map((route) => {
     const request = {
       method: route.method,
@@ -62,13 +60,15 @@ function detectHeaders(routeMiddlewares, appMiddlewares) {
   return headers;
 }
 
-function detectRequestBody(middlewares, handlerCode) {
+function detectRequestBody(middlewares, handlerCode = "") {
   const hasBodyParser = middlewares.some(
     (middleware) =>
-      middleware.code.includes("express.json()") ||
-      middleware.code.includes("express.urlencoded()")
+      typeof middleware.code === "string" &&
+      (middleware.code.includes("express.json()") ||
+        middleware.code.includes("express.urlencoded()"))
   );
-  const usesRequestBody = handlerCode.includes("req.body");
+  const usesRequestBody =
+    typeof handlerCode === "string" && handlerCode.includes("req.body");
 
   return hasBodyParser && usesRequestBody
     ? { mode: "raw", raw: "{{request_body}}" }

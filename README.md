@@ -41,7 +41,7 @@ npx postmanify-express generate --input <your-express-routes-file.js> --exclude 
 | `--input <file>`       | Path to the file containing your Express.js route definitions.The file must export an Express router or app instance.                                         | `npx postmanify-express generate --input examples/demo-app.js`                        |
 | `--output <file>`      | Path where the generated Postman collection will be saved. If not provided, the collection will be saved as postman-collection.json in the current directory. | ` npx postmanify-express generate --input examples/demo-app.js --output postman.json` |
 | `--exclude [<route>] ` | Route paths to exclude from the generated Postman collection. This option can be used multiple times to exclude multiple routes.                              | `npx postmanify-express generate --input examples/demo-app.js --exclude [/home]`      |
-| `--no auth`            | Skips the detection of authentication headers when generating the Postman collection.                                                                         | `npx postmanify-express generate --input examples/demo-app.js --no auth`              |
+| `--no auth`            | Skips the detection of authentication headers when generating the Postman collection.                                                                         | `npx postmanify-express generate --input examples/demo-app.js --no-auth`              |
 
 ## Features
 
